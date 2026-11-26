@@ -1,0 +1,25 @@
+name: Build VST3
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+      - name: Compilar
+        run: cmake --build build --config Release
+      - name: Subir VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: VocalChainStudio-${{ matrix.os }}
+          path: build/VocalChainStudio_artefacts/Release/VST3/
